@@ -1,62 +1,8 @@
-// // src/auth.ts
-// import NextAuth from "next-auth";
-// import GitHub from "next-auth/providers/github";
-
-// export const { handlers, signIn, signOut, auth } = NextAuth({
-// 	providers: [
-// 		GitHub({
-// 			clientId: process.env.AUTH_GITHUB_ID,
-// 			clientSecret: process.env.AUTH_GITHUB_SECRET,
-// 		}),
-// 	],
-// 	callbacks: {
-// 		signIn: async ({ user, account, profile }) => {
-// 			if (account?.provider === "github") {
-// 				console.table({
-// 					username: user.name,
-// 					email: user.email,
-// 					image: user.image,
-// 					providerAccountId: account.providerAccountId,
-// 					provider: account.provider,
-// 					profileAddress: profile?.address,
-// 					profileBirthDate: profile?.birthdate,
-// 					profileEmail: profile?.email,
-// 					profileEmailVerified: profile?.email_verified,
-// 				});
-
-// 				return true;
-// 			}
-// 			return false;
-// 		},
-// 		session: async ({ session, token }) => {
-// 			if (session.user && token.sub) {
-// 				session.user.id = token.sub;
-// 			}
-// 			return session;
-// 		},
-// 		jwt: async ({ token, user }) => {
-// 			if (user) {
-// 				token.id = user.id;
-// 			}
-// 			return token;
-// 		},
-// 	},
-// });
-
-import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
 import { eq } from "drizzle-orm";
 import { usersTable } from "./db/schema";
+import { db } from "@/db";
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
-
-// Initialize database with HTTP client
-const client = createClient({
-	url: process.env.DATABASE_URL!,
-	authToken: process.env.DATABASE_AUTH_TOKEN!,
-});
-
-const db = drizzle(client);
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
 	providers: [
@@ -86,6 +32,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 							image: user.image || null,
 							provider: account.provider,
 							providerId: account.providerAccountId,
+							role: "USER", // default role
 						};
 
 						await db.insert(usersTable).values(newUser);

@@ -1,7 +1,25 @@
+// components/AuthenticationStatus.tsx
 import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { checkUserRole } from "@/app/actions/checkUserRole";
 
 export default function AuthenticationStatus() {
 	const { data: session, status } = useSession();
+	const [userRole, setUserRole] = useState<string | null>(null);
+
+	useEffect(() => {
+		async function fetchRole() {
+			if (session?.user?.id) {
+				const role = await checkUserRole("ADMIN");
+				setUserRole(role ? "ADMIN" : "USER");
+			}
+		}
+
+		if (status === "authenticated") {
+			fetchRole();
+		}
+	}, [session?.user?.id, status]);
+
 	const statusStyles = {
 		loading: "text-yellow-500 animate-pulse",
 		authenticated: "text-green-600",
@@ -21,7 +39,9 @@ export default function AuthenticationStatus() {
 			<img
 				className="w-14 h-14 rounded-3xl"
 				src={session?.user?.image ?? undefined}
+				alt="User avatar"
 			/>
+			<p>Role: {userRole || "Loading..."}</p>
 		</div>
 	);
 }

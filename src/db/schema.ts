@@ -7,5 +7,6 @@ export const usersTable = sqliteTable("users", {
 	image: text("image"), // Store the user's avatar URL
 	provider: text("provider").notNull(), // "github", "google", etc.
 	providerId: text("provider_id").notNull().unique(), // GitHub user ID
+	role: text("role").notNull().default("USER"),
 	timestamp: text().default(sql`(CURRENT_TIMESTAMP)`),
 });

@@ -1,7 +1,3 @@
-// import "dotenv/config";
-// import { drizzle } from "drizzle-orm/libsql";
-// const db = drizzle(process.env.DB_FILE_NAME!);
-
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/libsql";
 import { eq } from "drizzle-orm";
