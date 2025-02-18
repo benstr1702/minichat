@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `chat_name` text;

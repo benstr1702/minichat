@@ -15,6 +15,13 @@
       "when": 1738952798676,
       "tag": "0003_tricky_nighthawk",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1739912492571,
+      "tag": "0004_funny_vanisher",
+      "breakpoints": true
     }
   ]
 }

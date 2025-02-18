@@ -28,6 +28,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 						// Create new user with proper type inference
 						const newUser: typeof usersTable.$inferInsert = {
 							name: user.name || null,
+							chatName: user.name || null,
 							email: user.email!, // We know this exists from GitHub
 							image: user.image || null,
 							provider: account.provider,
@@ -70,7 +71,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 					.get();
 
 				if (dbUser) {
+					// Add the user ID to the session
 					session.user.id = dbUser.id.toString();
+
+					// Add chatName to session if available
+					if (dbUser.chatName) {
+						session.user.chatName = dbUser.chatName;
+					}
+
+					// Keep original GitHub name
+					session.user.name = dbUser.name;
 				}
 			}
 			return session;
