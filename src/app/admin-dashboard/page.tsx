@@ -2,13 +2,14 @@
 import { auth } from "@/auth";
 import { checkUserRole, getAllUsers } from "../actions/checkUserRole";
 import { ReactElement } from "react";
+import { redirect } from "next/navigation";
 
 export default async function AdminDashboard(): Promise<ReactElement> {
 	const session = await auth();
 
 	// Check if the user is authenticated
 	if (!session) {
-		return <div>Not authenticated</div>;
+		redirect("/auth/login");
 	}
 
 	if (!session.user?.id) {
@@ -18,9 +19,7 @@ export default async function AdminDashboard(): Promise<ReactElement> {
 	// Check if the user has the 'ADMIN' role
 	const isAdmin = await checkUserRole("ADMIN");
 	if (!isAdmin) {
-		return (
-			<div>Access denied. You do not have the required permissions.</div>
-		);
+		return <div>403 Access denied.</div>;
 	}
 
 	// Fetch all users

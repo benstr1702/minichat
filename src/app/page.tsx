@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import AuthenticationStatus from "@/components/AuthenticationStatus";
 import SignOutButton from "@/components/SignOutButton";
 import LoginRedirect from "@/components/LoginRedirect";
+import ProfileButton from "@/components/ProfileButton";
 
 export default function Home() {
 	const { data: session, status } = useSession();
@@ -27,8 +28,9 @@ export default function Home() {
 							<LoginRedirect />
 						</div>
 					) : (
-						<div className="transition-all duration-200 hover:scale-[1.02]">
+						<div className="transition-all flex justify-center gap-5 duration-200 hover:scale-[1.02]">
 							<SignOutButton />
+							<ProfileButton />
 						</div>
 					)}
 
