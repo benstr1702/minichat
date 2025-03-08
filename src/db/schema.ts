@@ -11,3 +11,20 @@ export const usersTable = sqliteTable("users", {
 	role: text("role").notNull().default("USER"),
 	timestamp: text().default(sql`(CURRENT_TIMESTAMP)`),
 });
+
+export const messagesTable = sqliteTable("messages", {
+	id: int("id").primaryKey({ autoIncrement: true }),
+	userId: int("user_id")
+		.notNull()
+		.references(() => usersTable.id, { onDelete: "cascade" }),
+	roomId: text("room_id").notNull(),
+	text: text("text").notNull(),
+	timestamp: text().default(sql`(CURRENT_TIMESTAMP)`),
+});
+
+export const roomsTable = sqliteTable("rooms", {
+	id: int("id").primaryKey({ autoIncrement: true }),
+	name: text("name").notNull().unique(),
+	displayName: text("display_name").notNull().unique(),
+	createdAt: text().default(sql`(CURRENT_TIMESTAMP)`),
+});

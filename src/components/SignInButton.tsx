@@ -12,6 +12,7 @@ export default function SignInButton() {
 				alt="GitHub Icon"
 				className="w-5 h-5"
 			/>
+
 			<span>Sign in with GitHub</span>
 		</button>
 	);

@@ -1,6 +1,6 @@
 // src/app/admin-dashboard/page.tsx
 import { auth } from "@/auth";
-import { checkUserRole, getAllUsers } from "../actions/checkUserRole";
+import { checkUserRole, getAllUsers } from "../../actions/checkUserRole";
 import { ReactElement } from "react";
 import { redirect } from "next/navigation";
 
