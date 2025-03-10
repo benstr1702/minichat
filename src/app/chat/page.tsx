@@ -11,6 +11,7 @@ interface Message {
 }
 
 let socketInstance: Socket | null = null;
+
 export default function Chat() {
 	const [socket, setSocket] = useState<Socket | null>(null);
 	const [messages, setMessages] = useState<Message[]>([]);
@@ -22,59 +23,71 @@ export default function Chat() {
 			const user = (await checkUserAuthentication()).chatName;
 			setUserName(user);
 
+			let isNewSocket = false;
 			if (!socketInstance) {
 				socketInstance = io("http://localhost:3000");
-				console.log("New socket created with ID:", socketInstance.id);
-			} else {
-				console.log("Reusing socket with ID:", socketInstance.id);
+				isNewSocket = true;
 			}
 
-			setSocket(socketInstance);
+			console.log(
+				`${isNewSocket ? "New" : "Reusing"} socket with ID:`,
+				socketInstance.id
+			);
 
-			if (!socketInstance.connected) {
-				socketInstance.emit("join", { user });
-				console.log("Emitted join for user:", user);
-			} else if (socketInstance.disconnected) {
-				socketInstance.connect();
-				socketInstance.emit("join", { user });
-				console.log("Reconnected and emitted join for user:", user);
-			}
+			setSocket(socketInstance); // Emit join only once on initial connection
 
-			socketInstance.on("message", (message: Message) => {
-				setMessages((prev) => [...prev, message]);
+			socketInstance?.on("connect", () => {
+				socketInstance?.emit("join", { user, channel: "general" });
+				console.log(
+					"Emitted join for user:",
+					user,
+					"to channel: general"
+				);
 			});
 
-			socketInstance.on("userJoined", (data: { user: string }) => {
-				const joinNotification: Message = {
-					id: crypto.randomUUID(),
-					user: "System",
-					text: `${data.user} joined the room`,
-					type: "notification",
-				};
-				console.log(joinNotification);
-
-				setMessages((prev) => [...prev, joinNotification]);
+			socketInstance.on("message", (message: Message) => {
+				setMessages((prev) => {
+					const newMessages = [...prev, message];
+					console.log("Updated messages:", newMessages); // This will show the new messages
+					return newMessages;
+				});
 			});
 
 			socketInstance.on(
+				"userJoined",
+				(data: { id: string; user: string; channel: string }) => {
+					const joinNotification: Message = {
+						id: data.id,
+						user: "System",
+						text: `${data.user} joined the room`,
+						type: "notification",
+					};
+					setMessages((prev) => {
+						const newMessages = [...prev, joinNotification];
+						console.log("Updated messages:", newMessages); // This will show the new messages
+						return newMessages;
+					});
+				}
+			);
+
+			socketInstance.on(
 				"userLeft",
-				(data: { user: { username: string } }) => {
-					console.log(data);
+				(data: { id: string; user: string }) => {
 					const leaveNotification: Message = {
-						id: crypto.randomUUID(),
+						id: data.id, // server-provided ID
 						user: "System",
 						text: `${data.user} left the room`,
 						type: "notification",
 					};
-					console.log(leaveNotification);
 					setMessages((prev) => [...prev, leaveNotification]);
 				}
 			);
 
 			return () => {
+				socketInstance?.off("connect");
+				socketInstance?.off("message");
 				socketInstance?.off("userJoined");
 				socketInstance?.off("userLeft");
-				socketInstance?.off("message");
 				console.log("Cleaned up listeners for socket");
 			};
 		};
@@ -82,21 +95,12 @@ export default function Chat() {
 		initializeChat();
 	}, []);
 
-	const sendMessage = async () => {
+	const sendMessage = () => {
 		if (input.trim() && socket && userName) {
-			console.log(messages);
-
-			const newMessage: Message = {
-				id: crypto.randomUUID(),
-				user: userName, // Use the stored userName instead of calling checkUserAuthentication again
-				text: input.trim(),
-				type: "message",
-			};
-			socket.emit("message", newMessage);
+			socket.emit("message", input.trim()); // Send only text; server adds ID and user
 			setInput("");
 		}
 	};
-
 	return (
 		<div className="flex flex-col max-w-md mx-auto mt-10 border rounded-lg shadow-lg p-4 bg-white">
 			<div className="h-64 overflow-y-auto p-2 border-b">
