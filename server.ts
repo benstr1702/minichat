@@ -9,22 +9,16 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const channels = new Map([
-	[
-		"general",
-		{ id: "general", channelName: "General", channelDesc: "General Chat" },
-	],
+	["general", { id: "general", name: "General", desc: "General Chat" }],
 	[
 		"icebox",
 		{
 			id: "icebox",
-			channelName: "Icebox",
-			channelDesc: "Very cold out here",
+			name: "Icebox",
+			desc: "Very cold out here",
 		},
 	],
-	[
-		"breeze",
-		{ id: "breeze", channelName: "Breeze", channelDesc: "Breezy Channel" },
-	],
+	["breeze", { id: "breeze", name: "Breeze", desc: "Breezy Channel" }],
 ]);
 app.prepare().then(() => {
 	const server = createServer(handle); // Create HTTP Server
