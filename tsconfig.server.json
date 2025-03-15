@@ -1,11 +1,10 @@
 {
-	"extends": "./tsconfig.json",
 	"compilerOptions": {
-		"module": "CommonJS",
-		"esModuleInterop": true,
-		"target": "ES2019",
-		"moduleResolution": "node",
-		"outDir": "dist"
+		"outDir": "./dist",
+		"target": "esnext",
+		"module": "commonjs",
+		"strict": true,
+		"esModuleInterop": true
 	},
 	"include": ["server.ts"]
 }
